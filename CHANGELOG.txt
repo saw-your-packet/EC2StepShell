@@ -4,3 +4,11 @@ Change Log
 0.0.1 (12/02/2023)
 ------------------
 First publish
+
+1.0.0 (14/02/2023)
+------------------
+Fixes for installation and publishing
+
+1.0.1 (14/02/2023)
+------------------
+Fix hostname bug
