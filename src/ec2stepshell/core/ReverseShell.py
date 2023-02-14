@@ -77,7 +77,7 @@ class ReverseShell:
             directory='.'
         )
 
-        if hostname is None:
+        if hostname_obj is None:
             cprint('[!] Hostname not retrieved. Try running with increased delay.', 'red')
             exit()
 
