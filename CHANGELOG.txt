@@ -12,3 +12,7 @@ Fixes for installation and publishing
 1.0.1 (14/02/2023)
 ------------------
 Fix hostname bug
+
+1.0.2 (14/02/2023)
+------------------
+Fix pwd bug

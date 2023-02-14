@@ -93,7 +93,7 @@ class ReverseShell:
             directory='.'
         )
 
-        if pwd is None:
+        if pwd_obj is None:
             cprint('[!] Working directory not retrieved. Try running with increased delay.', 'red')
             exit()
 
