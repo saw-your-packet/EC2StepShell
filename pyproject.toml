@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "EC2StepShell"
+version = "1.0.0"
+description = "EC2StepShell is an AWS post-exploitation tool for getting reverse shells in public or private EC2 instances"
+readme = "README.md"
+authors = [{name = "Eduard Agavriloae", email = "saw-your-packet@breakingbreakpoints.com"}]
+license = {file = "LICENCE.txt" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security"
+]
+keywords = ["cloud security", "AWS" , "EC2StepShell"]
+dependencies = ["colorama", "termcolor", "pyfiglet", "boto3"]
+requires-python = ">=3.6"
+
+[project.urls]
+Homepage = "https://github.com/saw-your-packet/EC2StepShell"
+
+[project.scripts]
+realpython = "ec2stepshell.__main__:main"

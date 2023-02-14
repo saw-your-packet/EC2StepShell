@@ -1,4 +1,4 @@
-from utils.constants import const,user_config
+from ec2stepshell.utils.constants import const,user_config
 from termcolor import cprint
 import os.path
 

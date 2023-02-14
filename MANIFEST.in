@@ -1,2 +1,3 @@
 recursive-include src *.py
 global-include *.md *.txt *.py
+global-include *.toml

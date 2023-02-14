@@ -1,4 +1,4 @@
-from utils.constants import const
+from ec2stepshell.utils.constants import const
 
 class CommandOutput:
     def __init__(self, status, output):

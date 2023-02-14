@@ -3,7 +3,7 @@ import argparse
 from colorama import init
 from termcolor import cprint
 from pyfiglet import figlet_format
-from utils.constants import user_config
+from ec2stepshell.utils.constants import user_config
 
 
 class ArgumentsHandler:
@@ -76,7 +76,8 @@ class ArgumentsHandler:
 
         parser = argparse.ArgumentParser(
             description="Getting reverse shells into EC2 instances, even if you don't have network connectivity to them.",
-            epilog="Additional commands are available after a shell is established. Once the shell started, type '!help' to access them."
+            epilog="Additional commands are available after a shell is established. Once the shell started, type '!help' to access them.",
+            prog="python3 -m ec2stepshell"
         )
 
         cprint("Author: Eduard Agavriloae\n\t@saw-your-packet\n\teduard@breakingbreakpoints.com\n", "magenta")

@@ -1,5 +1,5 @@
 import boto3
-from utils.CommandOutput import CommandOutput
+from ec2stepshell.utils.CommandOutput import CommandOutput
 
 class SsmWrapper:
     def __init__(self, profile, access_key, secret_key, token, region):

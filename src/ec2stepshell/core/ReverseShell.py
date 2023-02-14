@@ -3,9 +3,9 @@ import re
 import traceback
 from termcolor import cprint
 from time import sleep
-from ssm.SsmWrapper import SsmWrapper
-from utils.constants import const, user_config
-from utils.terminal.TerminalEmulator import TerminalEmulator
+from ec2stepshell.ssm.SsmWrapper import SsmWrapper
+from ec2stepshell.utils.constants import const, user_config
+from ec2stepshell.utils.terminal.TerminalEmulator import TerminalEmulator
 
 
 class ReverseShell:
@@ -68,7 +68,7 @@ class ReverseShell:
   
 
     def get_shell_display(self, instance_id, os):
-        cprint('\n[x] Retrieving hostname', 'light_blue')
+        cprint('\n[x] Retrieving hostname', 'blue')
 
         hostname_obj = self.send_command_and_get_output(
             document=const[os]['document'],
@@ -77,10 +77,14 @@ class ReverseShell:
             directory='.'
         )
 
-        hostname = hostname_obj.output.replace('\n', '')
-        cprint('\t Hostname: ' + hostname, 'light_blue')
+        if hostname is None:
+            cprint('[!] Hostname not retrieved. Try running with increased delay.', 'red')
+            exit()
 
-        cprint('[x] Retrieving working directory', 'light_blue')
+        hostname = hostname_obj.output.replace('\n', '')
+        cprint('\t Hostname: ' + hostname, 'blue')
+
+        cprint('[x] Retrieving working directory', 'blue')
 
         pwd_obj = self.send_command_and_get_output(
             document=const[os]['document'],
@@ -89,13 +93,17 @@ class ReverseShell:
             directory='.'
         )
 
+        if pwd is None:
+            cprint('[!] Working directory not retrieved. Try running with increased delay.', 'red')
+            exit()
+
         pwd = pwd_obj.output.replace('\n', '')
 
         if os == 'windows':
             matches = re.findall(r".:\\.+(?=\r)", pwd_obj.output, re.MULTILINE)
             pwd = matches[0]
 
-        cprint('\t Working directory: ' + pwd + '\n', 'light_blue')
+        cprint('\t Working directory: ' + pwd + '\n', 'blue')
 
         terminal_emulator = TerminalEmulator(hostname=hostname, pwd=pwd)
 
@@ -212,10 +220,14 @@ class ReverseShell:
                 directory='.',
             )
  
+            if output is None:
+                cprint('[!] An error occurred. Increase delay or manually specify OS','red')
+                exit()
+
             if output.status == const['general']['command_statuses']['failed']:
                 raise Exception('OS')
             if output.status == const['general']['command_statuses']['success']:
-                cprint(f'[x] Instance\'s OS is {os}', 'blue')
+                cprint(f'[x] Instance\'s OS is {os.upper()}', 'blue')
                 user_config['os'] = os
             else:
                 cprint('[!] Can\'t determine OS. Try increasing the maximum retries, the retry delay or take a guess.', 'red')
