@@ -13,8 +13,7 @@ python -m pip install EC2StepShell
 
 If you target a public EC2 instance, you might be able to get a reverse shell using well known payloads. However, the tool shines for the cases when the instance is in a private network or its security groups don't allow communications with your IP.
 
-![short-demo-ec2stepshell](https://user-images.githubusercontent.com/38787278/218664059-b414e5f3-2d8b-4a6d-a48e-7f085d98d772.gif)
-
+![zoomed-short-demo-ec2stepshell](https://user-images.githubusercontent.com/38787278/219875886-05f367af-6782-4137-bd49-8e1b78652c36.gif)
 
 ```bash
 python -m ec2stepshell -h
