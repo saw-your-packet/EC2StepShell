@@ -3,6 +3,8 @@
 EC2StepShell is an AWS post-exploitation tool for getting high privileges reverse shells in public or private EC2 instances.
 It works by sending commands to EC2 instances using ssm:SendCommand and then retrieves the output using ssm:ListCommandInvocations.
 
+More details about how the tool works can be found here: https://securitycafe.ro/2023/03/08/ec2stepshell-reverse-shells-private-ec2-instances/
+
 ## Installation
 
 ```bash
