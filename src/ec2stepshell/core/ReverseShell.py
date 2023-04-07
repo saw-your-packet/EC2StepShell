@@ -3,6 +3,7 @@ import re
 import traceback
 from termcolor import cprint
 from time import sleep
+from botocore.exceptions import ClientError
 from ec2stepshell.ssm.SsmWrapper import SsmWrapper
 from ec2stepshell.utils.constants import const, user_config
 from ec2stepshell.utils.terminal.TerminalEmulator import TerminalEmulator
@@ -18,9 +19,15 @@ class ReverseShell:
             region=region
         )
         self.queue = {}
+        self.use_list_command_invocations = False
 
     def start_shell(self, instance_id):
         cprint('[x] Starting reverse shell on EC2 instance ' + instance_id, 'blue')
+        cprint('[x] Determining method for retrieving output', 'blue')
+
+        # true - list_command_invocations will be used
+        # false - get_command_invocation will be used
+        self.use_list_command_invocations = self.determine_retrieve_method()
         self.determine_os(instance_id, user_config['os'])
 
         terminal_emulator = self.get_shell_display(instance_id, user_config['os'])
@@ -70,19 +77,27 @@ class ReverseShell:
     def get_shell_display(self, instance_id, os):
         cprint('\n[x] Retrieving hostname', 'blue')
 
-        hostname_obj = self.send_command_and_get_output(
-            document=const[os]['document'],
-            command='hostname',
-            instance_id=instance_id,
-            directory='.'
-        )
+        try:
+            hostname_obj = self.send_command_and_get_output(
+                document=const[os]['document'],
+                command='hostname',
+                instance_id=instance_id,
+                directory='.'
+            )
 
-        if hostname_obj is None:
-            cprint('[!] Hostname not retrieved. Try running with increased delay.', 'red')
-            exit()
+            if hostname_obj is None:
+                cprint('[!] Hostname not retrieved. Try running with increased delay.', 'red')
+                exit()
 
-        hostname = hostname_obj.output.replace('\n', '')
-        cprint('\t Hostname: ' + hostname, 'blue')
+            hostname = hostname_obj.output.replace('\n', '')
+            cprint('\t Hostname: ' + hostname, 'blue')
+        except ClientError as ex:
+            if ex.response['Error']['Code'] == 'AccessDeniedException':
+                cprint("[!] Permission ssm:SendCommand is denied.", 'red')
+                cprint("[!] Execution can not continue.", 'red')
+                cprint("[x] Exit...", 'blue')
+                exit()
+
 
         cprint('[x] Retrieving working directory', 'blue')
 
@@ -135,7 +150,12 @@ class ReverseShell:
                 self.queue[command_id] = command
                 break
 
-            output_command = self.ssm_wrapper.get_execution_output(command_id=command_id)
+            output_command = self.ssm_wrapper.get_execution_output(
+                command_id=command_id,
+                use_list_commands=self.use_list_command_invocations,
+                instance_id=instance_id
+                )
+            
             execution_finished = output_command.is_execution_finished()
 
             if execution_finished == False:
@@ -217,7 +237,7 @@ class ReverseShell:
                 document=const[os]['document'],
                 command='whoami',
                 instance_id=instance_id,
-                directory='.',
+                directory='.'
             )
  
             if output is None:
@@ -244,4 +264,27 @@ class ReverseShell:
                 exit()
 
 
+    def determine_retrieve_method(self):
+        has_list_permissions = self.ssm_wrapper.has_list_permissions()
+
+        if has_list_permissions:
+            cprint('[x] Permission ssm:ListCommandInvocations granted', 'blue')
+            cprint('[x] Using ssm:ListCommandInvocations as command output retrieve method', 'blue')
+
+            return True
         
+        cprint('[~] Permission ssm:ListCommandInvocations denied', 'yellow')
+        cprint('[~] Checking permission for ssm:GetCommandInvocation', 'yellow')
+
+        has_get_permissions = self.ssm_wrapper.has_get_permissions()
+
+        if has_get_permissions:
+            cprint('[x] Permission ssm:GetCommandInvocation granted', 'blue')
+            cprint('[x] Using ssm:GetCommandInvocation as command output retrieve method', 'blue')
+
+            return False
+        
+        cprint('[~] Permission ssm:GetCommandInvocation denied', 'yellow')
+        cprint("[!] You don't have permissions to get the output of the command. Try some payloads relying only on ssm:SendCommand as described here: https://securitycafe.ro/2023/04/17/7-lesser-known-aws-ssm-document-techniques-for-code-execution/", 'red')
+        
+        exit()

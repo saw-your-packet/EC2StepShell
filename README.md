@@ -28,7 +28,7 @@ python -m ec2stepshell -h
 - You need a programmatic access within the account (temporary/persistent access credentials)
 - You need two permissions:
   - ssm:SendCommand
-  - ssm:ListCommandInvocations
+  - ssm:ListCommandInvocations or ssm:GetCommandInvocation
 
 The action ssm:SendCommand must be granted over the target EC2 instance and the documents:
 - AWS-RunShellScript

@@ -1,4 +1,5 @@
 import boto3
+from botocore.exceptions import ClientError
 from ec2stepshell.utils.CommandOutput import CommandOutput
 
 class SsmWrapper:
@@ -45,15 +46,52 @@ class SsmWrapper:
         return command_id
 
 
-    def get_execution_output(self, command_id):
-        response = self.client.list_command_invocations(
-            CommandId = command_id,
-            Details = True
-        )
+    def get_execution_output(self, command_id, use_list_commands=True, instance_id=''):
+        response = status = output = None
 
-        status = response['CommandInvocations'][0]['CommandPlugins'][0]['Status']
-        output = response['CommandInvocations'][0]['CommandPlugins'][0]['Output']
-        
+        if use_list_commands == True:
+            response = self.client.list_command_invocations(
+                CommandId = command_id,
+                Details = True
+            )
+
+            status = response['CommandInvocations'][0]['CommandPlugins'][0]['Status']
+            output = response['CommandInvocations'][0]['CommandPlugins'][0]['Output']
+        else:
+            response = self.client.get_command_invocation(
+                CommandId = command_id,
+                InstanceId = instance_id
+            )
+
+            status = response['Status']
+            output = response['StandardOutputContent']
+
         command_output = CommandOutput(status, output)
 
         return command_output
+    
+    
+    def has_list_permissions(self):
+        try:
+            self.client.list_command_invocations(
+                CommandId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                Details = True
+            )
+        except ClientError as ex:
+            if ex.response['Error']['Code'] == 'AccessDeniedException':
+                return False
+
+        return True
+
+    
+    def has_get_permissions(self):
+        try:
+            self.client.get_command_invocation(
+                CommandId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                InstanceId = 'i-aaaaaaaaaaaaaaaaa'
+            )
+        except ClientError as ex:
+            if ex.response['Error']['Code'] == 'AccessDeniedException':
+                return False
+        
+        return True

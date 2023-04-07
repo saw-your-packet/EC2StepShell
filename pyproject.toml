@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "EC2StepShell"
-version = "1.0.2"
+version = "1.1.0"
 description = "EC2StepShell is an AWS post-exploitation tool for getting reverse shells in public or private EC2 instances"
 readme = "README.md"
 authors = [{name = "Eduard Agavriloae", email = "saw-your-packet@breakingbreakpoints.com"}]
