@@ -80,7 +80,7 @@ class ArgumentsHandler:
             prog="python3 -m ec2stepshell"
         )
 
-        cprint("Author: Eduard Agavriloae\n\t@saw_your_packet\n\teduard@hacktodef.com\n", "magenta")
+        cprint("Author: Eduard Agavriloae\n\t@saw_your_packet\n\teduard.agavriloae@hacktodef.com\n", "magenta")
 
         parser.add_argument('instance', help='the ID of the target EC2 instance')
 
