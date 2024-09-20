@@ -25,4 +25,4 @@ requires-python = ">=3.6"
 Homepage = "https://github.com/saw-your-packet/EC2StepShell"
 
 [project.scripts]
-realpython = "ec2stepshell.__main__:main"
+ec2stepshell = "ec2stepshell.__main__:main"
